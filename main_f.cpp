@@ -2,24 +2,25 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
-struct record // 链表节点
+struct record // 链表结点
 {
     string name;
     string address;
     int birth_year;
     string phone_number;
-    record *next; // 指向下一个链表节点
+    record *next; // 指向下一个链表结点
 };
 
 class llist // 链表类
 {
 private:
-    record *start;    // 链表起始节点的指针，默认为NULL
+    record *start;    // 链表起始结点的指针，默认为NULL
     string file_name; // 用于读取数据并存储数据的文件，默认为"save.txt"
     int read_file();
     void write_file();
     void reverse_llist(record *);
     void delete_all_records();
+    void sort_by_year(record *);
 
 public:
     llist(string file = "save");
@@ -30,6 +31,7 @@ public:
     void print_all_records();
     int delete_record(string);
     void reverse_llist();
+    void sort_by_year();
 };
 void run_program();        // 运行整个程序
 void display_commands();   // 显示菜单
@@ -121,7 +123,7 @@ void llist::write_file()
 
     if (start == NULL)
     {
-        cout << "数据库为空, 因此没有记录被写入到文件\"" << file_name << "\"中.\n";
+        cout << "数据库为空, 因此没有记录被写入文件\"" << file_name << "\"中.\n";
         write_file.close();
     }
 
@@ -139,7 +141,7 @@ void llist::write_file()
         ++record_count;
     } while (index != NULL);
 
-    cout << "已将" << record_count << "条记录写入到文件\"" << file_name << "\"中.\n";
+    cout << "已将" << record_count << "条记录写入文件\"" << file_name << "\"中.\n";
     write_file.close();
 }
 
@@ -154,8 +156,47 @@ void llist::reverse_llist(record *pointer)
     {
         reverse_llist(pointer->next); // 下面语句暂不执行，进入递归
         (pointer->next)->next = pointer;
-        if (--node_number == 1) // 当pointer为反转前的起始节点时
+        if (--node_number == 1) // 当pointer为反转前的起始结点时
             pointer->next = NULL;
+    }
+}
+
+void llist::sort_by_year(record *pointer)
+{
+    int length = 1; // 存储链表长度
+    record *temp_start = new record;
+    record *temp;
+    temp_start->next = pointer; // 添加一个空白的链表起始结点，以便于冒泡排序算法的实现
+
+    while (pointer->next != NULL) // 计算链表长度
+    {
+        length++;
+        pointer = pointer->next;
+    }
+
+    for (int i = 1; i < length; i++) // 进行length-1趟冒泡
+    {
+        int count = 0;     // 记录这一趟冒泡进行的结点比较次数
+        bool flag = false; // 标记这一趟冒泡是否进行了结点位置交换操作
+        record *p = temp_start;
+        start = p->next; // 更新链表实际开始结点
+        while (p->next != NULL && count < (length - i)) // 每趟冒泡
+        {
+            if (p->next->birth_year > p->next->next->birth_year)
+            {
+                flag = true; // 标记这一趟冒泡进行了结点位置交换操作
+                // 进行结点位置交换
+                temp = p->next;
+                p->next = p->next->next;
+                temp->next = p->next->next;
+                p->next->next = temp;
+            }
+            count++;
+            p = p->next; // 比较下一对结点
+        }
+        // 这一趟冒泡没有进行结点位置交换操作，说明链表已经有序
+        if (flag == false)
+            break;
     }
 }
 
@@ -185,7 +226,7 @@ int llist::add_record(string input_name, string input_address, int input_birth_y
     temp->address = input_address;
     temp->birth_year = input_birth_year;
     temp->phone_number = input_phone_number;
-    while (index != NULL) // 使previous指向当前链表的最后一个节点
+    while (index != NULL) // 使previous指向当前链表的最后一个结点
     {
         previous = index;
         index = index->next;
@@ -238,6 +279,7 @@ int llist::print_record(string input_name)
     }
     else
     {
+        cout << "--------------------\n";
         cout << "共打印了" << records_printed << "条姓名为\"" << input_name << "\"的记录.\n";
     }
     cout << "--------------------\n";
@@ -299,6 +341,7 @@ void llist::print_all_records()
         cout << "电话号码: " << index->phone_number << '\n';
         index = index->next;
     }
+    cout << "--------------------\n";
     cout << "共打印了" << record_count << "条记录.\n";
     cout << "--------------------\n";
     return;
@@ -308,7 +351,7 @@ int llist::delete_record(string input_name)
 {
     struct record *temp = NULL;
     struct record *index = start;
-    struct record *previous = NULL; // 要保证previous始终是index的上一个节点
+    struct record *previous = NULL; // 要保证previous始终是index的上一个结点
     int records_deleted = 0;
     cout << "--------------------\n";
     if (start == NULL)
@@ -322,12 +365,12 @@ int llist::delete_record(string input_name)
         if (index->name == input_name)
         {
             temp = index;
-            if (index == start) // 如果是起始节点
+            if (index == start) // 如果是起始结点
             {
                 index = index->next;
                 start = index;
             }
-            else // 重设前后链表节点
+            else // 重设前后链表结点
             {
                 index = index->next;
                 previous->next = index;
@@ -335,7 +378,7 @@ int llist::delete_record(string input_name)
             delete temp;
             ++records_deleted;
         }
-        else // 使previous始终是index的上一个节点
+        else // 使previous始终是index的上一个结点
         {
             previous = index;
             index = index->next;
@@ -368,6 +411,26 @@ void llist::reverse_llist() // 函数重载1，函数作用是输出文字说明
     {
         reverse_llist(start);
         cout << "已反转所有记录.\n";
+    }
+    cout << "--------------------\n";
+    return;
+}
+
+void llist::sort_by_year()
+{
+    cout << "--------------------\n";
+    if (start == NULL)
+    {
+        cout << "数据库为空, 无法重排顺序.\n";
+    }
+    else if (start->next == NULL)
+    {
+        cout << "数据库中仅有一个数据, 无法重排顺序.\n";
+    }
+    else
+    {
+        sort_by_year(start);
+        cout << "已按年龄由大到小重排所有记录.\n";
     }
     cout << "--------------------\n";
     return;
@@ -438,10 +501,15 @@ void run_program()
             cout << "反转记录顺序中...\n";
             records.reverse_llist();
             break;
+        case 7:
+            cout << "--------------------\n";
+            cout << "重排记录中...\n";
+            records.sort_by_year();
+            break;
         }
-        if (menu_selection != 7)
+        if (menu_selection != 8)
             display_commands();
-    } while (menu_selection != 7);
+    } while (menu_selection != 8);
 }
 
 void display_commands()
@@ -453,7 +521,8 @@ void display_commands()
     cout << "\t4: 打印所有记录.\n";
     cout << "\t5: 删除指定姓名的记录.\n";
     cout << "\t6: 反转所有记录的顺序.\n";
-    cout << "\t7: 退出程序.\n";
+    cout << "\t7: 按年龄由大到小重排所有记录.\n";
+    cout << "\t8: 退出程序.\n";
     cout << "请输入选项值: ";
 }
 
@@ -463,7 +532,7 @@ int get_menu_selection() // 获取输入的菜单选项值并进行错误处理�
     char ch;       // 用于接受下一个输入进行判断
     cin >> selection;
 
-    while ((ch = cin.get()) != '\n' || selection < 1 || selection > 7) // 当输入失败或选项越界时
+    while ((ch = cin.get()) != '\n' || selection < 1 || selection > 8) // 当输入失败或选项越界时
     {
         if (cin.fail() || ch != '\n')
         {
@@ -472,7 +541,7 @@ int get_menu_selection() // 获取输入的菜单选项值并进行错误处理�
             while (cin.get() != '\n')
                 ; // 清除错误输入，直至遇到换行符
         }
-        else if (selection < 1 || selection > 7)
+        else if (selection < 1 || selection > 8)
         {
             cout << "无对应选项, 请重新输入.\n";
             display_commands();
