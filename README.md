@@ -17,6 +17,4 @@
 g++ -o main mis_main.cpp mis.cpp llist.cpp
 ```
 
-提交的文件中，`main_f.cpp`文件是可以直接运行的程序文件，`save.txt`是测试数据，文件夹“程序”里的文件是将`main_f.cpp`文件分割为的几个单文件，其中main是UNIX可执行文件。
-
 > 参考项目：https://github.com/mickyjm/c.cpp.address.book.project
