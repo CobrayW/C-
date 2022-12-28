@@ -15,7 +15,7 @@ class llist // 链表类
 {
 private:
     record *start;    // 链表起始结点的指针，默认为NULL
-    string file_name; // 用于读取数据并存储数据的文件，默认为"save.txt"
+    string file_name; // 用于读取并存储数据的文件名
     int read_file();
     void write_file();
     void reverse_llist(record *);
@@ -23,13 +23,13 @@ private:
     void sort_by_year(record *);
 
 public:
-    llist(string file = "save");
+    llist(string);
     ~llist();
     void add_record(string, string, int, string);
-    int print_record(string);
-    int modify_record(string, string, int, string);
+    void print_record(string);
+    void modify_record(string, string, int, string);
     void print_all_records();
-    int delete_record(string);
+    void delete_record(string);
     void reverse_llist();
     void sort_by_year();
 };
@@ -250,7 +250,7 @@ void llist::add_record(string input_name, string input_address, int input_birth_
     cout << "--------------------\n";
 }
 
-int llist::print_record(string input_name)
+void llist::print_record(string input_name)
 {
     record *index = start;
     int records_printed = 0; // 标识共找到了几个记录
@@ -259,7 +259,6 @@ int llist::print_record(string input_name)
     {
         cout << "数据库为空, 因此没有姓名为\"" << input_name << "\"的记录.\n";
         cout << "--------------------\n";
-        return -1;
     }
     while (index != NULL) // 在链表中逐个比对
     {
@@ -286,10 +285,9 @@ int llist::print_record(string input_name)
         cout << "共打印了" << records_printed << "条姓名为\"" << input_name << "\"的记录.\n";
     }
     cout << "--------------------\n";
-    return 1;
 }
 
-int llist::modify_record(string input_name, string input_address, int input_year, string input_phone_number)
+void llist::modify_record(string input_name, string input_address, int input_year, string input_phone_number)
 {
     record *index = start;
     int records_modified = 0;
@@ -298,7 +296,6 @@ int llist::modify_record(string input_name, string input_address, int input_year
     {
         cout << "数据库为空, 因此没有姓名为\"" << input_name << "\"的记录.\n";
         cout << "--------------------\n";
-        return -1;
     }
     while (index != NULL) // 在链表中逐个比对并修改
     {
@@ -320,7 +317,6 @@ int llist::modify_record(string input_name, string input_address, int input_year
         cout << "共修改了" << records_modified << "条姓名为\"" << input_name << "\"的记录.\n";
     }
     cout << "--------------------\n";
-    return 1;
 }
 
 void llist::print_all_records()
@@ -351,18 +347,17 @@ void llist::print_all_records()
     return;
 }
 
-int llist::delete_record(string input_name)
+void llist::delete_record(string input_name)
 {
-    struct record *temp = NULL;
-    struct record *index = start;
-    struct record *previous = NULL; // 要保证previous始终是index的上一个结点
+    record *temp = NULL;
+    record *index = start;
+    record *previous = NULL; // 要保证previous始终是index的上一个结点
     int records_deleted = 0;
     cout << "--------------------\n";
     if (start == NULL)
     {
         cout << "数据库为空, 因此无姓名为\"" << input_name << "\"的记录.\n";
         cout << "--------------------\n";
-        return -1;
     }
     while (index != NULL)
     {
@@ -397,7 +392,6 @@ int llist::delete_record(string input_name)
         cout << "共删除了" << records_deleted << "条姓名为\"" << input_name << "\"的记录.\n";
     }
     cout << "--------------------\n";
-    return 1;
 }
 
 void llist::reverse_llist() // 函数重载1，函数作用是输出文字说明
@@ -601,6 +595,12 @@ string get_file_name() // 获取输入作为要打开的文件名
     string file_name;
     cout << "请输入文件名(文件扩展名\".txt\"将自动添加): ";
     getline(cin, file_name);
+    while (file_name == "")
+    {
+        cout << "文件名不能为空, 请重新输入: ";
+        cin.clear();
+        getline(cin, file_name);
+    }
     file_name += ".txt";
     return file_name;
 }

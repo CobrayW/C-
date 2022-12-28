@@ -8,7 +8,7 @@ class llist // 链表类
 {
 private:
     record *start;    // 链表起始结点的指针，默认为NULL
-    string file_name; // 用于读取数据并存储数据的文件，默认为"save.txt"
+    string file_name; // 用于读取数据并存储数据的文件
     int read_file();
     void write_file();
     void reverse_llist(record *);
@@ -16,13 +16,13 @@ private:
     void sort_by_year(record *);
 
 public:
-    llist(string file = "save");
+    llist(string);
     ~llist();
     void add_record(string, string, int, string);
-    int print_record(string);
-    int modify_record(string, string, int, string);
+    void print_record(string);
+    void modify_record(string, string, int, string);
     void print_all_records();
-    int delete_record(string);
+    void delete_record(string);
     void reverse_llist();
     void sort_by_year();
 };

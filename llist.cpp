@@ -4,7 +4,7 @@
 #include <string>
 #include "record.h"
 #include "llist.h"
-#include "MIS.h"
+#include "mis.h"
 using namespace std;
 
 llist::llist(string file)
@@ -215,7 +215,7 @@ void llist::add_record(string input_name, string input_address, int input_birth_
     cout << "--------------------\n";
 }
 
-int llist::print_record(string input_name)
+void llist::print_record(string input_name)
 {
     record *index = start;
     int records_printed = 0; // 标识共找到了几个记录
@@ -224,7 +224,6 @@ int llist::print_record(string input_name)
     {
         cout << "数据库为空, 因此没有姓名为\"" << input_name << "\"的记录.\n";
         cout << "--------------------\n";
-        return -1;
     }
     while (index != NULL) // 在链表中逐个比对
     {
@@ -251,10 +250,9 @@ int llist::print_record(string input_name)
         cout << "共打印了" << records_printed << "条姓名为\"" << input_name << "\"的记录.\n";
     }
     cout << "--------------------\n";
-    return 1;
 }
 
-int llist::modify_record(string input_name, string input_address, int input_year, string input_phone_number)
+void llist::modify_record(string input_name, string input_address, int input_year, string input_phone_number)
 {
     record *index = start;
     int records_modified = 0;
@@ -263,7 +261,6 @@ int llist::modify_record(string input_name, string input_address, int input_year
     {
         cout << "数据库为空, 因此没有姓名为\"" << input_name << "\"的记录.\n";
         cout << "--------------------\n";
-        return -1;
     }
     while (index != NULL) // 在链表中逐个比对并修改
     {
@@ -285,7 +282,6 @@ int llist::modify_record(string input_name, string input_address, int input_year
         cout << "共修改了" << records_modified << "条姓名为\"" << input_name << "\"的记录.\n";
     }
     cout << "--------------------\n";
-    return 1;
 }
 
 void llist::print_all_records()
@@ -316,18 +312,17 @@ void llist::print_all_records()
     return;
 }
 
-int llist::delete_record(string input_name)
+void llist::delete_record(string input_name)
 {
-    struct record *temp = NULL;
-    struct record *index = start;
-    struct record *previous = NULL; // 要保证previous始终是index的上一个结点
+    record *temp = NULL;
+    record *index = start;
+    record *previous = NULL; // 要保证previous始终是index的上一个结点
     int records_deleted = 0;
     cout << "--------------------\n";
     if (start == NULL)
     {
         cout << "数据库为空, 因此无姓名为\"" << input_name << "\"的记录.\n";
         cout << "--------------------\n";
-        return -1;
     }
     while (index != NULL)
     {
@@ -337,7 +332,7 @@ int llist::delete_record(string input_name)
             if (index == start) // 如果是起始结点
             {
                 index = index->next;
-                start = index;
+                start = index; // 重设起点
             }
             else // 重设前后链表结点
             {
@@ -362,7 +357,6 @@ int llist::delete_record(string input_name)
         cout << "共删除了" << records_deleted << "条姓名为\"" << input_name << "\"的记录.\n";
     }
     cout << "--------------------\n";
-    return 1;
 }
 
 void llist::reverse_llist() // 函数重载1，函数作用是输出文字说明
