@@ -11,8 +11,6 @@
 - 反转所有记录的顺序。
 - 按年龄由大到小重排所有记录。
 
-项目GitHub链接：https://github.com/CobrayW/C-MIS
-
 程序链接方式如下：
 
 ```
