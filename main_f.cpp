@@ -25,9 +25,9 @@ private:
 public:
     llist(string file = "save");
     ~llist();
-    int add_record(string, string, int, string);
+    void add_record(string, string, int, string);
     int print_record(string);
-    int modify_record(string, string, string);
+    int modify_record(string, string, int, string);
     void print_all_records();
     int delete_record(string);
     void reverse_llist();
@@ -91,11 +91,11 @@ int llist::read_file()
     {
         temp = new record;
         getline(read_file, temp->name);
-        getline(read_file, temp->address, '$'); // 截断字符$
-        read_file >> temp->birth_year;
-        getline(read_file, blank_line);
+        getline(read_file, temp->address, '$'); // 截断字符$，读取到$并丢弃$
+        read_file >> temp->birth_year; // cin类对象可以忽略有效输入前的空白字符
+        getline(read_file, blank_line); // 清除换行符
         getline(read_file, temp->phone_number);
-        getline(read_file, blank_line);
+        getline(read_file, blank_line); // 清除空行
         ++record_count;
         if (previous == NULL) // 只有首次才执行该条件对应的语句块
         {
@@ -123,7 +123,7 @@ void llist::write_file()
 
     if (start == NULL)
     {
-        cout << "数据库为空, 因此没有记录被写入文件\"" << file_name << "\"中.\n";
+        cout << "数据库为空, 因此没有记录被写入文件\"" << file_name << "\".\n";
         write_file.close();
     }
 
@@ -141,7 +141,7 @@ void llist::write_file()
         ++record_count;
     } while (index != NULL);
 
-    cout << "已将" << record_count << "条记录写入文件\"" << file_name << "\"中.\n";
+    cout << "已将" << record_count << "条记录写入文件\"" << file_name << "\".\n";
     write_file.close();
 }
 
@@ -155,9 +155,12 @@ void llist::reverse_llist(record *pointer)
     else
     {
         reverse_llist(pointer->next); // 下面语句暂不执行，进入递归
-        (pointer->next)->next = pointer;
+        pointer->next->next = pointer;
         if (--node_number == 1) // 当pointer为反转前的起始结点时
+        {
             pointer->next = NULL;
+            node_number = 0;
+        }
     }
 }
 
@@ -179,8 +182,7 @@ void llist::sort_by_year(record *pointer)
         int count = 0;     // 记录这一趟冒泡进行的结点比较次数
         bool flag = false; // 标记这一趟冒泡是否进行了结点位置交换操作
         record *p = temp_start;
-        start = p->next; // 更新链表实际开始结点
-        while (p->next != NULL && count < (length - i)) // 每趟冒泡
+        while (count < (length - i)) // 每趟冒泡
         {
             if (p->next->birth_year > p->next->next->birth_year)
             {
@@ -198,6 +200,8 @@ void llist::sort_by_year(record *pointer)
         if (flag == false)
             break;
     }
+    start = temp_start->next; // 更新链表实际开始结点
+    delete temp_start;
 }
 
 void llist::delete_all_records()
@@ -216,7 +220,7 @@ void llist::delete_all_records()
     }
 }
 
-int llist::add_record(string input_name, string input_address, int input_birth_year, string input_phone_number)
+void llist::add_record(string input_name, string input_address, int input_birth_year, string input_phone_number)
 {
     record *temp = NULL;
     record *index = start;
@@ -244,7 +248,6 @@ int llist::add_record(string input_name, string input_address, int input_birth_y
     cout << "--------------------\n";
     cout << "记录已添加.\n";
     cout << "--------------------\n";
-    return 1;
 }
 
 int llist::print_record(string input_name)
@@ -286,7 +289,7 @@ int llist::print_record(string input_name)
     return 1;
 }
 
-int llist::modify_record(string input_name, string input_address, string input_phone_number)
+int llist::modify_record(string input_name, string input_address, int input_year, string input_phone_number)
 {
     record *index = start;
     int records_modified = 0;
@@ -302,6 +305,7 @@ int llist::modify_record(string input_name, string input_address, string input_p
         if (input_name == index->name)
         {
             index->address = input_address;
+            index->birth_year = input_year;
             index->phone_number = input_phone_number;
             ++records_modified;
         }
@@ -452,7 +456,7 @@ int main()
 void run_program()
 {
     llist records(get_file_name()); // 使用构造函数初始化对象
-    string input_name, input_address, input_phone, blank_line;
+    string input_name, input_address, input_phone;
     int input_year, menu_selection;
 
     display_commands();
@@ -481,9 +485,9 @@ void run_program()
             cout << "修改指定姓名的记录\n";
             input_name = get_name();
             input_address = get_address();
-            getline(cin, blank_line);
+            input_year = get_birth_year();
             input_phone = get_phone_number();
-            records.modify_record(input_name, input_address, input_phone);
+            records.modify_record(input_name, input_address, input_year, input_phone);
             break;
         case 4: // 打印所有的记录
             cout << "--------------------\n";
@@ -561,9 +565,10 @@ string get_name() // 获取人员的姓名并返回
 
 string get_address() // 获取人员的地址并返回
 {
-    string address;
+    string address, blank_line;
     cout << "请输入人员的地址(以\"$\"标识输入结束):\n";
     getline(cin, address, '$');
+    getline(cin, blank_line); // 清除输入流中的$和换行符
     return address;
 }
 
