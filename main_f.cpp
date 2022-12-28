@@ -92,8 +92,8 @@ int llist::read_file()
         temp = new record;
         getline(read_file, temp->name);
         getline(read_file, temp->address, '$'); // 截断字符$，读取到$并丢弃$
-        read_file >> temp->birth_year; // cin类对象可以忽略有效输入前的空白字符
-        getline(read_file, blank_line); // 清除换行符
+        read_file >> temp->birth_year;          // cin类对象可以忽略有效输入前的空白字符
+        getline(read_file, blank_line);         // 清除换行符
         getline(read_file, temp->phone_number);
         getline(read_file, blank_line); // 清除空行
         ++record_count;
@@ -442,7 +442,6 @@ void llist::sort_by_year()
 
 int main()
 {
-    using namespace std;
     cout << "********************\n";
     cout << "欢迎使用人员信息管理系统!\n";
     cout << "********************\n";
